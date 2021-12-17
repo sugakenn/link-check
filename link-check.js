@@ -1,6 +1,6 @@
 //基準になるサイトマップ httpから始まると動的に取得
 //そうでない場合はローカルファイルから取得
-const strSitemapRoot = 'https://nanbu.marune205.net/sitemap.xml';
+const strSitemapRoot = 'https://XMLサイトマップへのパス';
 //const strSitemapRoot = 'd:\\link\\sitemap1.xml';
 
 //結果保存先 通常は上書き
@@ -23,7 +23,7 @@ const fs = require('fs');
 //文字コード変換ライブラリ
 const iconv = require('iconv-lite');
 //xmlパーサライブラリ
-const htmlparser2 = require("htmlparser2");;
+const htmlparser2 = require("htmlparser2");
 //ヘッドレスブラウザライブラリ
 const puppeteer = require('puppeteer');
 
@@ -51,7 +51,7 @@ const parserForNormalSitemap = new htmlparser2.Parser({
     ontext(text) {
         //タグ内のテキストではターゲットのタグの時のみ処理
         if (parserForNormalSitemap.blnTarget) {
-        //オブジェクト内部に結果を保持する設定
+        　　//オブジェクト内部に結果を保持する設定
             if (parserForNormalSitemap.hasOwnProperty('results')===false) {
                 parserForNormalSitemap.results = [];
             }
@@ -77,7 +77,6 @@ async function getUrls(strFilePathOrUrl) {
 
 async function getUrlsFromWeb(strUrl) {
     //URLを取得してサイトマップインデックスだった場合は再帰
-    console.log(strUrl);
     let results = await getSiteMapsFromWeb(strUrl);
     let strUrls =[];
     for (let i =0; i < results.length;i++) {         
@@ -96,9 +95,6 @@ async function getUrlsFromWeb(strUrl) {
 
 async function getSiteMapsFromWeb(strUrl) {
     //サイトマップインデックスに対応
-    //一旦前の結果をクリア(同期処理を想定)    
-    //parserForBloggerSitemap.results =[];
-    
     let parserForBloggerSitemap = new htmlparser2.Parser({
         onopentag(name, attributes) {
             //ターゲットとなるタグの出現を保持するフラグ
@@ -166,8 +162,8 @@ async function getUrlsFromFile(strPath) {
 async function getLinks(strTargetUrl){
 
     console.log(strTargetUrl);
+    
     let result=false;
-  
     try {
       await page.goto(strTargetUrl, {waitUntil: 'networkidle2'});
   
@@ -215,18 +211,15 @@ async function checkLinkPageXMLHttpRequest(strLinkUrl) {
 
         let timeout=setTimeout(()=> {reject('timeout')},1000 * 60);
         req.onreadystatechange=function(){
-            
-            clearInterval(timeout);
-
             if (req.readyState == 4) {
-                //console.log(req);
+                clearInterval(timeout);
                 resultMap.set(strLinkUrl,req.status);
                 resolve(req.status);
             }
         }
 
-        //falseを指定して結果を待つ
-        req.open('GET',strLinkUrl,false);
+        //falseを指定して結果を待つ方法もあります
+        req.open('GET',strLinkUrl,true);
         req.send(null);
     });
 
@@ -277,6 +270,7 @@ async function checkLinkPageAxios(strTargetUrl){
     }
     try {
         let r = await axios.get(strTargetUrl).then(function (response) {
+            resultMap.set(strTargetUrl,response.status);
             return response.status; 
         }).catch(function(error) {
             //console.log(error);
@@ -362,6 +356,7 @@ async function main() {
                 fs.writeSync(intFd,',');
                 fs.writeSync(intFd,'InnerLink\r\n');    
             } else {
+                //リンク切れチェックは好きなものを使ってください
                 //let strStatus = await checkLinkPageAxios(links[j][0]);
                 //let strStatus = await checkLinkPagePuppeteer(links[j][0]);
                 let strStatus = await checkLinkPageXMLHttpRequest(links[j][0]);
