@@ -10,7 +10,7 @@ const outputFile ='d:\\link\\result.csv';
 //ここで入力したアドレスが出現するまで読み飛ばす
 //途中で停止した場合などに使う
 //値が空欄でない場合は結果ファイルの出力は追記モード
-const strSkipToUrl='https://nanbu.marune205.net/2021/12/msoffice2013-installer.html?m=1';
+const strSkipToUrl='';
 
 //リンクチェックにXMLHttpRequestを使う場合に有効にしてください。
 const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
