@@ -1,7 +1,7 @@
 //基準になるサイトマップ httpから始まると動的に取得
 //そうでない場合はローカルファイルから取得
-const strSitemapRoot = 'https://XMLサイトマップへのパス';
-//const strSitemapRoot = 'd:\\link\\sitemap1.xml';
+//const strSitemapRoot = 'https://XMLサイトマップへのパス';
+const strSitemapRoot = 'd:\\link\\sitemap1.xml';
 
 //結果保存先 通常は上書き
 const outputFile ='d:\\link\\result.csv';
@@ -10,9 +10,9 @@ const outputFile ='d:\\link\\result.csv';
 //ここで入力したアドレスが出現するまで読み飛ばす
 //途中で停止した場合などに使う
 //値が空欄でない場合は結果ファイルの出力は追記モード
-const strSkipToUrl='';
+const strSkipToUrl='https://nanbu.marune205.net/2021/12/msoffice2013-installer.html?m=1';
 
-//XMLHttpRequestを使う場合に有効にしてください。
+//リンクチェックにXMLHttpRequestを使う場合に有効にしてください。
 const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 
 //動的にサイトマップ取得する際か、チェックにaxiosを利用する場合に有効にしてください
@@ -207,7 +207,6 @@ async function checkLinkPageXMLHttpRequest(strLinkUrl) {
 
     let res = await new Promise((resolve,reject)=> {
         let req = new XMLHttpRequest();
-        let result;
 
         let timeout=setTimeout(()=> {reject('timeout')},1000 * 60);
         req.onreadystatechange=function(){
@@ -225,6 +224,29 @@ async function checkLinkPageXMLHttpRequest(strLinkUrl) {
 
     return res;
 }
+
+async function checkLinkPageXMLHttpRequest2(strLinkUrl) {
+    //同期処理
+
+    if (resultMap.has(strLinkUrl)) {
+        return resultMap.get(strLinkUrl);
+    }
+
+    let req = new XMLHttpRequest();
+    let res;
+    req.onreadystatechange=function(){
+        if (req.readyState == 4) {
+            resultMap.set(strLinkUrl,req.status);
+            res = req.status;
+        }
+    }
+
+    req.open('GET',strLinkUrl,false);
+    req.send(null);
+    
+    return res;
+}
+
 
 
 async function checkLinkPagePuppeteer(strTargetUrl){
@@ -357,9 +379,10 @@ async function main() {
                 fs.writeSync(intFd,'InnerLink\r\n');    
             } else {
                 //リンク切れチェックは好きなものを使ってください
-                //let strStatus = await checkLinkPageAxios(links[j][0]);
+                let strStatus = await checkLinkPageAxios(links[j][0]);
                 //let strStatus = await checkLinkPagePuppeteer(links[j][0]);
-                let strStatus = await checkLinkPageXMLHttpRequest(links[j][0]);
+                //let strStatus = await checkLinkPageXMLHttpRequest(links[j][0]);
+                //let strStatus = await checkLinkPageXMLHttpRequest2(links[j][0]);
 
                 fs.writeSync(intFd,sanitizeAndConv(strBlogUrls[i]));
                 fs.writeSync(intFd,',');
