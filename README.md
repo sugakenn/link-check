@@ -1,4 +1,4 @@
-# link-check
+# Broken link checker for Blogger (and others)
 
 Node.jsで動かす、ブログページのリンク切れチェッカーです。
 
